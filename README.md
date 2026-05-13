@@ -165,3 +165,7 @@ PUAAgents/
 ## Architecture
 
 See [architecture.md](architecture.md) for full design decisions including the market selection filter thresholds, data contracts between pipeline stages, and notes on framework choices.
+
+## License
+
+MIT
