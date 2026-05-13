@@ -43,7 +43,11 @@ At least one LLM key is required. If both are set, Anthropic is used. If only Ge
 ```python
 from orchestrator import run
 
+# Scan specific tags (fast — recommended)
 decisions = run(tags=["politics", "economics"], top_n=10)
+
+# Omit tags to scan all ~100 Polymarket tags (exhaustive — slower, more API calls)
+decisions = run(top_n=10)
 
 for d in decisions:
     print(f"{d.direction:4s}  {d.market_id}  ev={d.expected_value:+.2f}  size={d.size:.2f}")
