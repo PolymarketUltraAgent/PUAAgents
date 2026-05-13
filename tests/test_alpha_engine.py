@@ -78,7 +78,8 @@ def test_raises_when_no_key_set():
 
 def test_analyze_returns_alpha_signal():
     mock_resp = mock_anthropic_response(0.65, 0.80, "OPEC cuts support higher prices.")
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.return_value = mock_resp
         signal = analyze(make_snapshot(), make_articles())
     assert isinstance(signal, AlphaSignal)
@@ -86,7 +87,8 @@ def test_analyze_returns_alpha_signal():
 
 def test_analyze_computes_edge_correctly():
     mock_resp = mock_anthropic_response(0.65, 0.80, "rationale")
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.return_value = mock_resp
         signal = analyze(make_snapshot(yes_price=0.40), make_articles())
     assert signal.implied_prob == pytest.approx(0.40)
@@ -96,7 +98,8 @@ def test_analyze_computes_edge_correctly():
 
 def test_analyze_is_signal_true_when_edge_above_threshold():
     mock_resp = mock_anthropic_response(0.65, 0.80, "rationale")
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.return_value = mock_resp
         signal = analyze(make_snapshot(yes_price=0.40), make_articles())
     assert signal.is_signal is True
@@ -104,7 +107,8 @@ def test_analyze_is_signal_true_when_edge_above_threshold():
 
 def test_analyze_is_signal_false_when_edge_below_threshold():
     mock_resp = mock_anthropic_response(0.41, 0.80, "rationale")
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.return_value = mock_resp
         signal = analyze(make_snapshot(yes_price=0.40), make_articles())
     assert signal.edge < EDGE_THRESHOLD
@@ -118,7 +122,8 @@ def test_analyze_passes_question_in_prompt():
         captured["messages"] = kwargs.get("messages", [])
         return mock_anthropic_response(0.5, 0.7, "neutral")
 
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.side_effect = capture_create
         analyze(make_snapshot(question="Will X happen?"), make_articles())
 
@@ -127,7 +132,8 @@ def test_analyze_passes_question_in_prompt():
 
 def test_analyze_empty_articles_still_runs():
     mock_resp = mock_anthropic_response(0.50, 0.40, "No news available.")
-    with patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "GEMINI_API_KEY": ""}), \
+         patch("alpha_engine.engine.anthropic.Anthropic") as mock_client:
         mock_client.return_value.messages.create.return_value = mock_resp
         signal = analyze(make_snapshot(), articles=[])
     assert isinstance(signal, AlphaSignal)

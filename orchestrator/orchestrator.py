@@ -1,7 +1,7 @@
-from dataclasses import dataclass
 from market_fetcher import MarketSnapshot, get_market_snapshots
 from news_aggregator import fetch_news
 from alpha_engine import AlphaSignal, analyze
+from trade_advisor import TradeDecision, decide
 
 # Thresholds for Option 1 (liquidity/activity) + Option 2 (price proximity)
 MIN_VOLUME_24H = 10_000
@@ -11,17 +11,6 @@ MIN_COMPETITIVE = 0.80
 MIN_YES_PRICE = 0.05
 MAX_YES_PRICE = 0.95
 DEFAULT_TOP_N = 20
-
-
-@dataclass
-class TradeDecision:
-    market_id: str
-    question: str
-    direction: str      # "YES" | "NO" | "PASS"
-    size: float         # Kelly-sized position
-    entry_price: float
-    expected_value: float
-    rationale: str
 
 
 def is_worth_analyzing(snapshot: MarketSnapshot) -> bool:
@@ -52,11 +41,6 @@ def analyze_market(snapshot: MarketSnapshot) -> AlphaSignal:
     return analyze(snapshot, articles)
 
 
-def decide_trade(signal: AlphaSignal) -> TradeDecision:
-    """Run TradeAdvisor for a single AlphaSignal. (stub)"""
-    raise NotImplementedError("TradeAdvisor not yet built")
-
-
 def run(tags: list[str] | None = None, top_n: int = DEFAULT_TOP_N) -> list[TradeDecision]:
     """Full pipeline: fetch → filter → analyze → decide."""
     snapshots = get_market_snapshots(tags=tags)
@@ -65,7 +49,7 @@ def run(tags: list[str] | None = None, top_n: int = DEFAULT_TOP_N) -> list[Trade
     decisions = []
     for snapshot in candidates:
         signal = analyze_market(snapshot)
-        decision = decide_trade(signal)
+        decision = decide(signal)
         decisions.append(decision)
 
     return decisions
